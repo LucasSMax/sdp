@@ -1,0 +1,6 @@
+build/*
+dist/*
+sdp/*
+sdputils.egg-info/*
+sdputils/__pycache__/__init__.cpython-38.pyc
+sdputils/__pycache__/sdputils.cpython-38.pyc
