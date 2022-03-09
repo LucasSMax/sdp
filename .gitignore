@@ -4,3 +4,9 @@ sdp/*
 sdputils.egg-info/*
 sdputils/__pycache__/__init__.cpython-38.pyc
 sdputils/__pycache__/sdputils.cpython-38.pyc
+main.py
+exceptions/__pycache__/__init__.cpython-38.pyc
+.gitignore
+exceptions/__pycache__/exceptions.cpython-38.pyc
+sdputils/__pycache__/exceptions.cpython-38.pyc
+sdputils/teste.py
