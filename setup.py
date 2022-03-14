@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="sdputils",
-    version="1.0.4.8",
+    version="1.0.4.10",
     author="Lucas S. Maximiano",
     description="Utils' functions to use inside the Semantix Data Platform for data transformation.",
     install_requires=[

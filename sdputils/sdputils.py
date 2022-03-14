@@ -22,14 +22,16 @@ class SdpUtils:
         table_name = table_name.replace(" ", "_")
         return table_name
 
-    def csv_to_raw(self, path, chunksize=700, separator=';', verbose=False, check_duplicates=False, id_col=None):
+    def csv_to_raw(self, path, table_name=None, chunksize=700, separator=';', verbose=False, check_duplicates=False, id_col=None):
         '''
         Upload a CSV to a raw table.
         Args:
             path: Path to csv file;
         '''
         
-        table_name = self.get_csv_name(path=path)
+        if table_name is None:
+            table_name = self.get_csv_name(path=path)
+
         if check_duplicates and id_col == None:
             raise InvalidIdCol
 
@@ -37,12 +39,10 @@ class SdpUtils:
         
         if verbose:
             print(f'Uploading {table_name} to raw zone..')
-            upload_sign = ['.', '..', '...']
-            up_idx = 0
-            print(f'Uploading: {upload_sign[up_idx]}', end='\r')
-        
-        for df in df_generator:
+            up_idx = 1
+            print(f'Uploading:    ', end='\r')
 
+        for df in df_generator:
             cols = df.columns.str.lower().str.replace(' ', "_", regex=False)\
                                         .str.replace(',','', regex=False)\
                                         .str.replace('.','', regex=False)
@@ -52,18 +52,21 @@ class SdpUtils:
             df = df.astype(str)
             
             if check_duplicates:
-                df = self.get_new_entities(self.engine, df, id_col, f"hive.raw.{table_name}")
+                df = self.get_new_entities(df, id_col, f"hive.raw.{table_name}")
             
-            df.to_sql(table_name, con=self.engine, schema='raw', if_exists='append', index=False, method='multi')
+            df.to_sql(table_name, con=self.engine, schema='raw', if_exists='append', index=False, method='multi', chunksize=chunksize)
             
             if verbose:
-                if up_idx == len(upload_sign)-1:
-                    up_idx = 0
-                else:
+                if up_idx < 4:
+                    up_str = '.' * up_idx
+                    print(f'Uploading: {up_str}', end='\r')
                     up_idx += 1
-                print(f'Uploading: {upload_sign[up_idx]}', end='\r')
+                else:
+                    print(f'Uploading:    ', end='\r')
+                    up_idx = 1
         if verbose:
             print('Finished upload!')
+        return True
 
     def get_new_entities(self, df:pd.DataFrame, id_col:str, table:str, chunksize:int=700):
         '''
@@ -88,3 +91,7 @@ class SdpUtils:
         except:
             pass
         return df
+
+    def presto_exec(self,command):
+        self.cursor.execute(command)
+        return self.cursor.fetchall()
